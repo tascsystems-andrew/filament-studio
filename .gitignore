@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+._*
+
+# Editor swap / lock files
+*.swp
+*.swo
+*~
+.#*
+
+# Editor state — keep .claude/launch.json (dev-server config) but ignore private overrides
+.claude/settings.local.json
+.claude/*.local.*
+.vscode/
+.idea/
+
+# Ad-hoc scratch
+scratch/
+tmp/
