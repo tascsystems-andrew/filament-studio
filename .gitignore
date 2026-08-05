@@ -17,3 +17,6 @@
 # Ad-hoc scratch
 scratch/
 tmp/
+
+# Compiled Mac app bundle (build artifacts) — source lives in mac-app/
+mac-app/build/
