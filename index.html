@@ -604,7 +604,7 @@
       <button class="btn" id="playStageBtn" title="Play only the selected stage">▶ Play this stage</button>
       <div style="display:flex; gap:6px; margin-top:4px">
         <button class="btn" id="copyJson" title="Copy this stage's values as JSON">Copy JSON</button>
-        <button class="btn" id="saveJson" title="Save the JSON export as a .json file (full amp when the Amp block is selected)">💾 .json</button>
+        <button class="btn" id="saveJson" title="Save the export as a .filament file (JSON inside; full amp when the Amp block is selected)">💾 .filament</button>
         <button class="btn" id="sendHw" title="Open the Hardware Out tab">→ HW</button>
       </div>
     </div>
@@ -2373,7 +2373,7 @@ function downloadJsonExport() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${base}.filament.json`;
+  a.download = `${base}.filament`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -7215,7 +7215,7 @@ function renderAmpEditor(b) {
           <button class="btn" id="ampEditRename">Rename</button>
           <button class="btn" id="ampEditRecompute" title="Re-derive every tube's Q-point from its current params. Use after loading an amp or changing the PSU if values look stale.">🔄 Recompute</button>
           <button class="btn" id="ampEditCopyJson" title="Copy the entire amp — every stage's params, computed Q-points, PSU nodes, tone stack values, OPT/speaker — as JSON to the clipboard.">📋 Copy full JSON</button>
-          <button class="btn" id="ampEditSaveJson" title="Save the full-amp JSON as a .json file — importable by TubeHunter and other tools without a clipboard round-trip.">💾 Save .json</button>
+          <button class="btn" id="ampEditSaveJson" title="Save the full-amp export as a .filament file (JSON inside) — importable by TubeHunter and other tools without a clipboard round-trip.">💾 Save .filament</button>
         </div>
         <h3 style="margin:14px 0 8px">Signal chain</h3>
         <div class="chain-pills">${chainSummary || '<span class="help">(empty)</span>'}</div>
