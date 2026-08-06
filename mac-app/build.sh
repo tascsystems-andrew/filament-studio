@@ -65,6 +65,15 @@ mkdir -p "${APP_DIR}/Contents/Resources"
 echo "→ compiling AppMain.swift"
 swiftc -O AppMain.swift -o "${BIN_PATH}"
 
+echo "→ generating app icon"
+ICONSET_DIR="${BUILD_DIR}/AppIcon.iconset"
+ICONGEN_BIN="${BUILD_DIR}/generate-icon"
+rm -rf "${ICONSET_DIR}"
+swiftc -O GenerateIcon.swift -o "${ICONGEN_BIN}"
+"${ICONGEN_BIN}" "${ICONSET_DIR}" > /dev/null
+iconutil -c icns "${ICONSET_DIR}" -o "${APP_DIR}/Contents/Resources/AppIcon.icns"
+echo "→ AppIcon.icns installed"
+
 echo "→ writing Info.plist"
 cp Info.plist.template "${APP_DIR}/Contents/Info.plist"
 
@@ -125,20 +134,14 @@ fi
 
 # --- Install locally --------------------------------------------------------
 if [ "$INSTALL" = "1" ]; then
-    DEST="${HOME}/Applications/${BUNDLE_NAME}"
-    mkdir -p "${HOME}/Applications"
+    DEST="/Applications/${BUNDLE_NAME}"
+    mkdir -p "/Applications"
     rm -rf "${DEST}"
     cp -R "${APP_DIR}" "${DEST}"
     echo "→ installed: ${DEST}"
-
-    SIBLING="${HOME}/Applications/index.html"
-    if [ ! -f "${SIBLING}" ] && [ "$RELEASE" = "0" ]; then
-        ln -s "$(pwd)/../index.html" "${SIBLING}"
-        echo "→ symlinked index.html into ~/Applications (live edits reflect on next launch)"
-    fi
 fi
 
 if [ "$RUN" = "1" ]; then
     echo "→ launching"
-    open "${HOME}/Applications/${BUNDLE_NAME}"
+    open "/Applications/${BUNDLE_NAME}"
 fi
