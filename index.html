@@ -604,6 +604,7 @@
       <button class="btn" id="playStageBtn" title="Play only the selected stage">▶ Play this stage</button>
       <div style="display:flex; gap:6px; margin-top:4px">
         <button class="btn" id="copyJson" title="Copy this stage's values as JSON">Copy JSON</button>
+        <button class="btn" id="saveJson" title="Save the JSON export as a .json file (full amp when the Amp block is selected)">💾 .json</button>
         <button class="btn" id="sendHw" title="Open the Hardware Out tab">→ HW</button>
       </div>
     </div>
@@ -2355,6 +2356,31 @@ $('#copyJson').addEventListener('click', () => {
     navigator.clipboard.writeText($('#hwJson').value || presetJson());
   }
 });
+// Save the same export as a downloaded .json file — lets TubeHunter (and any other tool with
+// a file picker) import the chain directly, no clipboard round-trip. Same payload as Copy JSON:
+// full amp on the amp block, per-stage summary elsewhere.
+function _slugify(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'export';
+}
+function downloadJsonExport() {
+  const sel = chain[selectedIdx];
+  const isAmp = sel?.type === 'amp';
+  const json = isAmp ? fullAmpJson(sel) : ($('#hwJson').value || presetJson());
+  const base = isAmp
+    ? _slugify(chain[0]?.params?.ampName)
+    : `${_slugify(chain[0]?.params?.ampName)}-${_slugify(sel?.name || sel?.type)}`;
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${base}.filament.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // Delay revocation — WebKit needs the URL alive until the download actually starts.
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+$('#saveJson').addEventListener('click', downloadJsonExport);
 $('#sendHw').addEventListener('click', () => {
   $$('nav button').forEach(b => { if (b.dataset.tab==='hw') b.click(); });
 });
@@ -7189,6 +7215,7 @@ function renderAmpEditor(b) {
           <button class="btn" id="ampEditRename">Rename</button>
           <button class="btn" id="ampEditRecompute" title="Re-derive every tube's Q-point from its current params. Use after loading an amp or changing the PSU if values look stale.">🔄 Recompute</button>
           <button class="btn" id="ampEditCopyJson" title="Copy the entire amp — every stage's params, computed Q-points, PSU nodes, tone stack values, OPT/speaker — as JSON to the clipboard.">📋 Copy full JSON</button>
+          <button class="btn" id="ampEditSaveJson" title="Save the full-amp JSON as a .json file — importable by TubeHunter and other tools without a clipboard round-trip.">💾 Save .json</button>
         </div>
         <h3 style="margin:14px 0 8px">Signal chain</h3>
         <div class="chain-pills">${chainSummary || '<span class="help">(empty)</span>'}</div>
@@ -7219,6 +7246,13 @@ function renderAmpEditor(b) {
       btn.textContent = '✓ Copied';
       setTimeout(() => { btn.textContent = label; }, 1200);
     });
+  });
+  $('#ampEditSaveJson').addEventListener('click', () => {
+    downloadJsonExport();
+    const btn = $('#ampEditSaveJson');
+    const label = btn.textContent;
+    btn.textContent = '✓ Saved';
+    setTimeout(() => { btn.textContent = label; }, 1200);
   });
   wirePsuPanel(b);
   renderSharedPanels(b, null);    // populate the bottom strip with amp/PSU summary
